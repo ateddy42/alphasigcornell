@@ -1,0 +1,121 @@
+{% load static %}
+<!doctype html>
+<!--[if IE 9]><html class="lt-ie10" lang="en" > <![endif]-->
+<html class="no-js" lang="en" data-useragent="Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Trident/6.0)">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Rockledge{% block title %}{% endblock %}</title>
+<link rel="shortcut icon" type="image/png" href="{% static "web/favicon.ico" %}"/>
+<link rel="stylesheet" href="{% static "main/css/foundation.css" %}"/>
+<link rel="stylesheet" href="{% static "main/css/backend.css" %}"/>
+<script src="{% static "main/js/vendor/modernizr.js" %}"></script>
+{% block header %}{% endblock %}
+</head>
+<body>
+ 
+<div class="row"><br>
+<div class="panel">
+<div class="row">
+<div class="hide-for-small medium-2 columns">
+<a href="/" style="padding:0px"><img src="{% static "web/asp.png" %}" alt="Rockledge" name="Rockledge" style="max-width:90px" id="Rockledge"/></a>
+</div>
+<div class="hide-for-small medium-10 columns" style="text-align:right">
+{% if user.is_authenticated %}
+    <p>Welcome, {% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.get_username }}{% endif %}.<br />
+    <a href="/accounts/logout/?next={{ request.path }}">Logout</a> &bull; <a href="/accounts/pwd/">Change Password</a></p>
+{% else %}
+<p>Welcome, new user. Please <a href="/accounts/login/?next={{ request.path }}">log in</a>.</p>
+{% endif %}
+</div>
+<div class="row">
+<div class="small-centered show-for-small-only" style="text-align:center">
+<a href="/" style="padding:0px"><img src="{% static "web/asp.png" %}" alt="Rockledge" name="Rockledge" style="max-width:90px" id="Rockledge"/></a><br>
+{% if user.is_authenticated %}
+    <p>Welcome, {% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.get_username }}{% endif %}.<br />
+    <a href="/accounts/logout/?next={{ request.path }}">Logout</a> &bull; <a href="/accounts/pwd/">Change Password</a></p>
+{% else %}
+<p>Welcome, new user. Please <a href="/accounts/login/?next={{ request.path }}">log in</a>.</p>
+{% endif %}
+</div>
+</div>
+</div>
+</div>
+</div>
+
+{% block nav %}
+<div class="row show-for-small-only">
+<nav class="breadcrumbs">
+  <a href="/brothers/" {% if "/brothers/" == request.path %}class="current"{% endif %}>Bros</a>
+  <a target="_blank" href="https://www.google.com/calendar/embed?src=cornell.edu_1uiu0h2c6fob5do40vehvurqlk%40group.calendar.google.com&ctz=America/New_York">Calendar</a>
+  <!-- <a href="/treas/" {% if "/treas/" == request.path %}class="current"{% endif %}>Treasurer</a> -->
+  <!-- <a href="/reunion/all" {% if "/reunion/all/" == request.path %}class="current"{% endif %}>Reunion</a> -->
+  <a href="/rush/all/" {% if "/rush/all/" == request.path %}class="current"{% endif %}>Rush</a>
+  <!--<a href="/wiki/brother/" {% if "/wiki/brother" == request.path %}class="current"{% endif %}>Wiki</a>-->
+</nav><br>
+</div>
+<div class="row">
+<aside class="medium-3 columns hide-for-small">
+<div class="panel">
+<div class="section-container vertical-nav" data-section data-options="deep_linking: false; one_up: true">
+<section class="section">
+<h5 class="title"><a href="/">Home</a></h5>
+</section>
+<section class="section">
+<h5 class="title">{% if "/brothers/" != request.path %}<a href="/brothers/">Brothers</a>{% else %}<em>Brothers</em>{% endif %}</h5>
+</section>
+<section class="section show-for-large-up">
+<h5 class="title">{% if "/calendar/" != request.path %}<a href="/calendar/">Calendar</a>{% else %}<em>Calendar</em>{% endif %}</h5>
+</section>
+<section class="section hide-for-large-up">
+<h5 class="title"><a target="_blank" href="https://www.google.com/calendar/embed?src=cornell.edu_1uiu0h2c6fob5do40vehvurqlk%40group.calendar.google.com&ctz=America/New_York">Calendar</a></h5>
+</section>
+<!-- <section class="section">
+<h5 class="title">{% if "/treas/" != request.path %}<a href="/treas/">Treasurer</a>{% else %}<em>Treasurer</em>{% endif %}</h5>
+</section> -->
+<!-- <section class="section">
+<h5 class="title">{% if "/reunion/all/" != request.path %}<a href="/reunion/all/">Reunion</a>{% else %}<em>Reunion</em>{% endif %}</h5>
+</section> -->
+<section class="section">
+<h5 class="title">{% if "/rush/all/" != request.path %}<a href="/rush/all/">Rush</a>{% else %}<em>Rush</em>{% endif %}</h5>
+</section>
+<!--<section class="section">
+<h5 class="title">{% if "/wiki/brother/" != request.path %}<a href="/wiki/brother/">Wiki</a>{% else %}<em>Wiki</em>{% endif %}</h5>
+</section>-->
+</div>
+</div>
+</aside>
+{% endblock %}
+ 
+ 
+<div class="medium-9 columns">
+ 
+<div class="panel">
+{% block body %}{% endblock %}
+</div>
+</div>
+ 
+<footer class="row">
+<div class="medium-12 columns">
+<div class="panel">
+<div class="large-10 columns small-centered" align="center">
+    <p><font size="3"><strong>Alpha Sigma Phi - Iota Chapter</strong></font><br />
+    <font size="2">Rockledge, Cornell University<br />
+    <a href="mailto:webmaster@alphasigcornell.org" target="_blank" style="color:#CCCCCC">webmaster@alphasigcornell.org</a></font></p></div>
+</ul>
+</div>
+</div>
+</div>
+</footer>
+<script src="{% static "main/js/vendor/jquery.js" %}"></script>
+<script src="{% static "main/js/foundation.min.js" %}"></script>
+<script src="{% static "main/js/foundation/foundation.js" %}"></script>
+{% block footer %}{% endblock %}
+<script>
+    $(document).foundation();
+	var doc = document.documentElement;
+	doc.setAttribute('data-useragent', navigator.userAgent);
+</script>
+</body>
+</html>

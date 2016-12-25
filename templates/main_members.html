@@ -1,0 +1,55 @@
+{% extends "main_base.html" %}
+
+{% block body %}
+<div class="row">
+  <div class="medium-12 columns">
+    <table>
+      <thead>
+        <tr>
+          <th width="400">Officer</th>
+          <th width="400">Name</th>
+          <th width="400" class="hide-for-small-only">Contact</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for office in officers %}
+        <tr>
+          <td>{{ office.position }}</td>
+          <td><div class="show-for-small-only"><a href="mailto:{{ office.email }}">{{ office.name }}</a></div><div class="hide-for-small">{{ office.name }}</div></td>
+          <td class="show-for-medium-up"><a href="mailto:{{ office.email }}">{{ office.email }}</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+<br>
+<div class="row">
+    <div class="medium-12 columns">
+    	<div class="panel radius callout">
+          <h3 style="text-align:center">Brothers of Rockledge</h3> 
+        </div>
+        <div class="row">
+          <div class="medium-12 columns">
+            <div class="small-block-grid-2 medium-block-grid-3 large-block-grid-4">
+                {% for bro in bros %}
+                <li class="bro">
+                  <div class="row">
+                    <div class="small-12 columns">
+                      <img src="{{ STATIC_URL }}{{ bro.pic }}">
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="small-12 columns">
+                      <span class="name">{{ bro.first }} {{ bro.last }} '{{bro.year|cut:'20'}}</span><br/>
+                      <span class="details">{{ bro.home }}<br/>{{ bro.major}}</span></p>
+                    </div>
+                  </div>
+                </li>
+                {% endfor %}
+            </div>
+          </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

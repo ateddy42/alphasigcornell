@@ -1,0 +1,84 @@
+{% load static %}
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rockledge | &Alpha;&Sigma;&Phi;</title>
+    <link rel="shortcut icon" type="image/png" href="{% static "web/favicon.ico" %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static "main/css/foundation.css" %}" />
+    <link rel="stylesheet" type="text/css" href="{% static "main/css/style.css" %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static "main/slick/slick.css" %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static "main/slick/slick-theme.css" %}"/>
+    <script src="{% static "main/js/vendor/modernizr.js" %}"></script>
+  </head>
+  <body>
+
+    <!--Header-->
+
+    <div class="contain-to-grid sticky">
+      <nav class="top-bar" data-topbar role="navigation">
+        <ul class="title-area">
+          <li class="name">
+            <h1>
+              <a href="/">
+                Alpha Sigma Phi, Iota Chapter
+              </a>
+            </h1>
+          </li>
+          <li class="toggle-topbar menu-icon"><a href="#"><span>menu</span></a></li>
+        </ul>
+
+        <section class="top-bar-section">
+          <ul class="right">
+          	<li><a href="/">HOME</a></li>
+            <li><a href="/history/">HISTORY</a></li>
+            <li><a href="/members/">MEMBERS</a></li>
+            <li><a href="/recruitment/">RECRUITMENT</a></li>
+            <li class="has-dropdown">
+              <a href="#">LINKS</a>
+              <ul class="dropdown">
+                <li><a href="/brothers/">BROTHERS LOGIN</a></li>
+                <li><a href="https://rockledge.2stayconnected.com/" target="_blank">ALUMNI WEBSITE</a></li>
+                <li><a href="http://rockledgefoundation.org/" target="_blank">ROCKLEDGE FOUNDATION</a></li>
+                <li><a href="http://alphasigmaphi.org/" target="_blank">NATIONAL WEBSITE</a></li>
+                <li><a href="https://www.facebook.com/rockledgecornell" target="_blank">FACEBOOK GROUP</a></li>
+              </ul>
+            </li>
+          </ul>
+        </section>
+      </nav>
+    </div>
+
+    {% block body %}{% endblock %}
+
+    <footer class="row">
+      <div class="medium-12 columns"><hr>
+        <div class="row">
+          <div class="medium-4 columns">
+            <p>© Copyright Alpha Sigma Phi, Iota Chapter</p>
+          </div>
+          <div class="medium-4 columns">
+            <p>Alpha Sigma Phi, Iota Chapter<br>804 Stewart Avenue<br>Ithaca, New York, 14850</p>
+          </div>
+          <div class="medium-4 columns">
+            <h6>Contact Us</h6>
+            <a href="mailto:webmaster@alphasigcornell.org">webmaster@alphasigcornell.org</a><br>
+            <a href="mailto:president@alphasigcornell.org">president@alphasigcornell.org</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    {% block scripts %}
+    <script src="{% static "main/js/vendor/jquery.js" %}"></script>
+    <script src="{% static "main/js/foundation.min.js" %}"></script>
+    <script src="{% static "main/js/foundation/foundation.equalizer.js" %}"></script>
+    <script src="{% static "main/js/foundation/foundation.alert.js" %}"></script>
+    <script>
+      $(document).foundation();
+    </script>
+    {% endblock %}
+
+  </body>
+</html>

@@ -1,0 +1,76 @@
+{% extends "main_base.html" %}
+{% load static %}
+
+{% block body %}
+<div class="row">
+  <div class="large-12 columns">
+    <div class="row">
+      <div class="large-12 columns">
+        <div class="featured">
+          <div><img width="100%" src="{% static "main/img/house16.jpg" %}" ></div>
+          <div><img width="100%" src="{% static "main/img/sp2016.jpg" %}" ></div>
+          <div><img width="100%" src="{% static "main/img/holiday.jpg" %}" ></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="medium-6 columns">
+        <img src="{% static "main/img/wine_tour.jpg" %}" width="100%">
+        <h5 class="panel" style="text-align:center">2014 Wine Tour</h6>
+      </div>
+      <div class="medium-6 columns">
+        <img src="{% static "main/img/parents16.jpg" %}" width="100%">
+        <h5 class="panel" style="text-align:center">2016 Parents Weekend</h6>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="large-12 columns">
+        <div class="panel radius">
+          <h5>The Alpha Sigma Phi Foundation's Mission</h5><hr>
+          <p>"To be a Foundation for Alpha Sigma Phi that inspires all members to support the organization long after graduation."</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="large-12 columns">
+        <div class="panel radius">
+          <h5>The Alpha Sigma Phi Foundation's Purpose</h5><hr>
+          <p>"To engage Alpha Sigs in opportunities to invest, give, and build in a fraternal experience to make good men better men."</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+    {% block scripts %}
+    <script src="{% static "main/js/vendor/jquery.js" %}"></script>
+    <script src="{% static "main/js/foundation.min.js" %}"></script>
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+  
+    <script type="text/javascript" src="{% static "main/slick/slick.min.js" %}"></script>
+
+    <script type="text/javascript">
+      $(document).ready(function(){
+        $('.featured').slick({
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          autoplay: true,
+          autoplaySpeed: 3000,
+          speed: 1000,
+          adaptiveHeight: false,
+          dots: true,
+          infinite: true,
+        });
+      });
+      $ = jQuery.noConflict( true );
+      (function( $ ) {
+        $(document).foundation();
+      })(jQuery);
+    </script>
+    {% endblock %}

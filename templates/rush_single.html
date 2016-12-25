@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %} - Rush - {{ first }} {{ last }}{% endblock %}
+
+{% block header %}
+<script language="JavaScript">
+function change_pic(u) {
+	document.getElementById('img').style.display = 'inline';
+	document.getElementById('img').src = u;
+	document.getElementById('img_link').setAttribute('href', u);
+}
+</script>
+{% endblock %}
+
+{% block body %}
+<h2>{{ first }} {{ last }}</h2>
+{% if is_rush %}
+<fieldset>
+  <legend style="background:none;">Rush Chair Settings</legend>
+  <div class="row">
+    <div class="large-6 columns">
+      <div class="small-9 columns">Rush Active</div>
+      <div class="small-3 columns">
+        <div class="switch round">
+          <input id="on-off-active" type="checkbox" {% if active %}checked{% endif %} onClick=" { window.location = '?a=' + ((this.checked) ? 1 : 0); }">
+            <label for="on-off-active">
+              <span class="switch-on">YES</span>
+              <span class="switch-off">NO</span>
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="large-6 columns">
+      <div class="small-9 columns">Rush Meeting Mirroring</div>
+      <div class="small-3 columns">
+        <div class="switch round">
+          <input id="on-off-mirror" type="checkbox" {% if mirroring %}checked{% endif %} onClick=" { window.location = '?m=' + ((this.checked) ? 1 : 0); }">
+            <label for="on-off-mirror">
+              <span class="switch-on">ON</span>
+              <span class="switch-off">OFF</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+</fieldset>
+{% endif %}
+<div class="row">
+<div class="small-12 columns">
+<table width="100%">
+    <thead>
+      <tr>
+        <th width="20%%">NetID</th>
+        <th width="30%">Phone #</th>
+        <th class="show-for-medium-up" width="30%">Building</th>
+        <th class="show-for-medium-up" width="20%">Room #</th>
+        
+      </tr>
+	</thead>
+  <tbody>
+      <tr>
+        <td>{{ netid }}</td>
+        <td>{{ phone }}</td>
+        <td class="show-for-medium-up">{{ build }}</td>
+        <td class="show-for-medium-up">{{ room }}</td>
+      </tr>
+  </tbody>
+</table>
+</div>
+<div class="small-12 columns show-for-small-only">
+<table width="100%">
+    <thead>
+      <tr>
+        <th width="30%">Building</th>
+        <th width="20%">Room #</th>
+      </tr>
+	</thead>
+  <tbody>
+      <tr>
+        <td>{{ build }}</td>
+        <td>{{ room }}</td>
+      </tr>
+  </tbody>
+</table>
+</div>
+</div>
+<br>
+<u>Dates:</U>
+{% for r in signin %}
+<li style="margin-left:10">{{ r.date|date:"D, N d, P" }}</li>
+{% endfor %}
+<br>
+<u>Questions:</U>
+{% for r in signin %}
+{% if r.qotd != '' %}
+<li style="margin-left:10"><strong>{{ r.qotd }}</strong> <i>{{ r.ans }}</i></li>
+{% endif %}
+{% endfor %}
+<!-- {% if events %}<br />
+<u>Events:</U>
+{% for e in events %}
+<li style="margin-left:10">{{ e.event }}</li>
+{% endfor %}<br />
+{% endif %}
+{% if is_sec %}<br />
+<form action="event/" method="post" name="event">{% csrf_token %}
+<input name="first" type="hidden" value="{{ first }}" />
+<input name="last" type="hidden" value="{{ last }}" />
+<input name="event" type="text" maxlength="1000" />
+<button name="add" value="add">Add Event</button>
+</form>
+{% endif %} -->
+{% if comments and comments_enabled %}<br />
+<u>Comments:</U>
+{% for c in comments %}
+<li style="margin-left:10">{{ c.comment }}</li>
+{% endfor %}
+{% endif %}
+{% if can_comment and comments_enabled %}
+<br />
+<form action="comment/" method="post" name="comment">{% csrf_token %}
+<input name="first" type="hidden" value="{{ first }}" />
+<input name="last" type="hidden" value="{{ last }}" />
+<textarea name="comment">{{thisComment}}</textarea>
+<button class="small" name="add" value="add">Add Comment</button>
+</form>
+{% endif %}
+<br>
+<u>Pics:</U><br><br />
+<ul class="clearing-thumbs" data-clearing>
+{% for r in signin %}
+<li><a class="th" href="{% if r.img.url == 'rush/no_img.jpeg' %}{% static "" %}{{ r.img.url }}{% else %}{{ r.img.url }}{% endif %}"><img src="{% if r.img_small.url == 'rush/no_img.jpeg' %}{% static "" %}{{ r.img_small.url }}{% else %}{{ r.img_small.url }}{% endif %}" ></a></li>
+{% endfor %}
+</ul>
+{% endblock %}
+
+
+
+{% block footer %}
+<script src="{% static "main/js/foundation/foundation.clearing.js" %}"></script>
+{% endblock %}

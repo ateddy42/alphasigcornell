@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if first %} - {{ first }} {{ last }}{% else %} - Content Unavailable{% endif %}{% endblock %}
+
+{% block header %}
+<script language="JavaScript">
+function change_pic(u) {
+	document.getElementById('img').style.display = 'inline';
+	document.getElementById('img').src = u;
+	document.getElementById('img_link').setAttribute('href', u);
+}
+</script>
+{% endblock %}
+
+{% block nav %}
+<div class="row">
+<aside class="medium-3 columns hide-for-small">
+<div class="panel">
+<div class="section-container vertical-nav" data-section data-options="deep_linking: false; one_up: true">
+<section class="section">
+<h5 class="title"><a href="/">Home</a></h5>
+</section>
+</div>
+</div>
+</aside>
+{% endblock %}
+
+{% block body %}
+{% if first %}
+<h2>{{ first }} {{ last }}</h2>
+<u>Dates:</U>
+{% for r in signin %}
+<li style="margin-left:10">{{ r.date|date:"D, N d, P" }}</li>
+{% endfor %}
+<br>
+<u>Questions:</U>
+{% for r in signin %}
+{% if r.qotd != '' %}
+<li style="margin-left:10"><strong>{{ r.qotd }}</strong> <i>{{ r.ans }}</i></li>
+{% endif %}
+{% endfor %}
+{% if events %}<br />
+<u>Events:</U>
+{% for e in events %}
+<li style="margin-left:10">{{ e.event }}</li>
+{% endfor %}<br />
+{% endif %}
+{% if comments and comments_enabled %}<br />
+<u>Comments:</U>
+{% for c in comments %}
+<li style="margin-left:10">{{ c.comment }}</li>
+{% endfor %}
+{% endif %}
+<br>
+<u>Pics:</U><br><br />
+<ul class="clearing-thumbs" data-clearing>
+{% for r in signin %}
+<li><a class="th" href="{% if r.img.url == 'rush/no_img.jpeg' %}{% static "" %}{{ r.img.url }}{% else %}{{ r.img.url }}{% endif %}"><img src="{% if r.img_small.url == 'rush/no_img.jpeg' %}{% static "" %}{{ r.img_small.url }}{% else %}{{ r.img_small.url }}{% endif %}" ></a></li>
+{% endfor %}
+</ul>
+{% else %}
+<div class="row">
+	<div class="small-12 columns">
+		<p>Content unavailable. The Rush Chair has either turned off mirroring, or it has timed out. Yell at the HZ - maybe that will fix it.</p>
+		<img src="{% static "main/img/dyldo.gif" %}">
+	</div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block footer %}
+<script src="{% static "main/js/foundation/foundation.clearing.js" %}"></script>
+{% endblock %}

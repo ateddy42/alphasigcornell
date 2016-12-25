@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} - Rush - View All{% endblock %}
+
+{% block body %}
+<h2>All Users</h2>
+
+<fieldset>
+  <legend style="background:none;">Rush Chair Settings - <a href="/rush/all/">View Rushes</a></legend>
+  <div class="row">
+    <div class="small-9 columns">Comment feature for rushes</div>
+    <div class="small-3 columns">
+      <div class="switch round">
+        <input id="on-off-comments" type="checkbox" {% if comments %}checked{% endif %} onClick="{ window.location = '?ec=' + ((this.checked) ? 1 : 0); }">
+        <label for="on-off-comments">
+          <span class="switch-on">ON</span>
+          <span class="switch-off">OFF</span>
+        </label>
+      </div>
+    </div>
+  </div>
+</fieldset>
+
+<div class="row">
+  <div class="small-12 columns">
+    <table width="100%">
+      <thead>
+          <tr>
+            <th width="40%"><strong>Last</strong></th>
+            <th width="40%"><strong>First</strong></th>
+            <th width="20%"><strong>Comments</strong></th>
+          </tr>
+      </thead>
+      <tbody>
+    {% for u in users %}
+        <tr>
+          <td style="font-style:italic">{{ u.last }}</td>
+          <td style="font-style:italic">{{ u.first }}</td>
+          <td style="text-align:center">
+            {% if u.rushChair %}RC{% else %}
+            <div class="switch round">
+              <input id="on-off-{{u.last}}" type="checkbox" {% if u.comments %}checked{% endif %} onClick="{ window.location = '?u={{u.id}}&c=' + ((this.checked) ? 1 : 0); }">
+              <label for="on-off-{{u.last}}">
+                <span class="switch-on">ON</span>
+                <span class="switch-off">OFF</span>
+              </label>
+            </div>
+          {% endif %}</td>    
+        </tr>
+    {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
