@@ -1,2 +1,4 @@
+.DS_Store
+*.pyc
 /dbProps.cnf
 /web/settings_production.py
