@@ -25,15 +25,13 @@ RewriteRule ^(.*)$ alphasigcornell.fcgi/$1 [QSA,L]
 </IfModule>
 ```
 
-Add a file named `alphasigcornell.fcgi` with the following contents:
+Add a file named `alphasigcornell.fcgi` with the following contents (replace ellipses with proper paths):
 ```
-#!/home/alphasi4/python27/bin/python27
+#!/......./python27
 import sys, os
 
 # Add a custom Python path.
-sys.path.append("/home/alphasi4/python27")
-sys.path.append("/home/alphasi4/public_html/dev/alphasigcornell")
-sys.path.append("/home/alphasi4/public_html/dev/alphasigcornell/web")
+sys.path.append(".../alphasigcornell")
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'web.settings_dev'
 from django.core.servers.fastcgi import runfastcgi
