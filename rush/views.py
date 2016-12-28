@@ -65,10 +65,10 @@ def view_rush(request, first, last):
     if can_view:
         try:
             rush = Rushee.objects.get(first=first, last=last)
-            signin = Signin.objects.filter(rid=rush.id).order_by('id')
-            comments = Comment.objects.filter(rid=rush.id).order_by('id')
+            signin = Signin.objects.filter(rid=rush).order_by('id')
+            comments = Comment.objects.filter(rid=rush).order_by('id')
             try:
-                thisComment = Comment.objects.get(rid=rush.id, broid=request.user.id).comment
+                thisComment = Comment.objects.get(rid=rush, broid=request.user.id).comment
                 thisComment = thisComment.split(" - ", 1)[1]
             except Comment.DoesNotExist:
                 thisComment = ""
@@ -78,7 +78,7 @@ def view_rush(request, first, last):
                 can_comment = Brothers.objects.get(uid=request.user.id).comments
             except Brothers.DoesNotExist:
                 Brothers(uid=request.user.id, comments=False).save()
-            # events = Event.objects.filter(rid=rush.id).order_by('id')
+            # events = Event.objects.filter(rid=rush).order_by('id')
             is_rush = request.user.groups.filter(name='RushChair')
             mirroring_settings = Settings.objects.get(name="HOUSE_MIRROR")
             if "m" in request.GET and is_rush: # Turn mirroring on/off
@@ -139,9 +139,9 @@ def view_house(request):
         return render(request, "rush_house.html")
     try:
         rush = Rushee.objects.get(id=u.val)
-        signin = Signin.objects.filter(rid=rush.id).order_by('date')
-        comments = Comment.objects.filter(rid=rush.id).order_by('id')
-        events = Event.objects.filter(rid=rush.id).order_by('id')
+        signin = Signin.objects.filter(rid=rush).order_by('date')
+        comments = Comment.objects.filter(rid=rush).order_by('id')
+        events = Event.objects.filter(rid=rush).order_by('id')
         return render(request, "rush_house.html", {"first":rush.first,
                                                 "last":rush.last,
                                                 "netid":rush.netid,
@@ -256,7 +256,7 @@ def add_comment(request, first, last):
         except Rushee.DoesNotExist:
             raise Http404
         try:
-            c = Comment.objects.get(rid=rush.id, broid = request.user.id)
+            c = Comment.objects.get(rid=rush, broid = request.user.id)
             print(comment)
             if comment == "":
                 c.delete()
@@ -265,7 +265,7 @@ def add_comment(request, first, last):
                 c.save()
         except Comment.DoesNotExist:
             comment = request.user.first_name + " - " + comment
-            Comment(rid=rush.id, comment=comment, broid=request.user.id).save()
+            Comment(rid=rush, comment=comment, broid=request.user.id).save()
         return HttpResponseRedirect("/rush/" + first +"_" + last + "/")
     else:
         return HttpResponseRedirect("/rush/" + first +"_" + last + "/")
@@ -279,7 +279,7 @@ def add_event(request, first, last):
         event = request.POST["event"]
         try:
             rush = Rushee.objects.get(first=first, last=last)
-            Event(rid=rush.id, event=event).save()
+            Event(rid=rush, event=event).save()
         except Rushee.DoesNotExist:
             raise Http404
         return HttpResponseRedirect("/rush/" + first +"_" + last + "/")
