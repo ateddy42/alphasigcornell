@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
-from datetime import datetime
+from django.utils import timezone
 
 class Rushee(models.Model):
     id = models.AutoField(db_index=True, primary_key=True)
@@ -13,7 +13,7 @@ class Rushee(models.Model):
     room = models.CharField(max_length=100)
     active = models.BooleanField(default=True)
     latest_signin = models.IntegerField(default=0)
-    latest_signin_date = models.DateTimeField(default=datetime.now)
+    latest_signin_date = models.DateTimeField(default=timezone.now)
     
 class Signin(models.Model):
     id = models.AutoField(db_index=True, primary_key=True)

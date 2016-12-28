@@ -7,6 +7,7 @@ from base64 import b64decode
 from django.core.files.base import ContentFile
 from PIL import Image
 from django.conf import settings
+from django.utils import timezone
 import datetime
 
 DEFAULT_QOTD = "Greatest American hero?"
@@ -103,7 +104,7 @@ def view_rush(request, first, last):
                 try:
                     r = Settings.objects.get(name="HOUSE_CURRENT")
                     r.val = rush.id
-                    r.date = datetime.datetime.now()
+                    r.date = timezone.now()
                     r.save()
                 except Settings.DoesNotExist:
                     Settings(name="HOUSE_CURRENT", val=rush.id).save()
@@ -308,7 +309,7 @@ def save_rush(request):
                 rid = r.id
             s = Signin(rid=r, qotd=qotd, ans=ans)
             if img:
-                img_name = last + '-' + first + '-' + datetime.datetime.now().strftime("%d-%m-%y") + '.jpeg'
+                img_name = last + '-' + first + '-' + timezone.now().strftime("%d-%m-%y") + '.jpeg'
                 s.img = ContentFile(img, img_name)
                 s.img_small = ContentFile(img, img_name)
             else:

@@ -2,4 +2,4 @@
 *.pyc
 *.log
 /dbProps.cnf
-/web/settings_production.py
+/web/settings_*.py
