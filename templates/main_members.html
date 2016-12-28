@@ -1,4 +1,5 @@
 {% extends "main_base.html" %}
+{% load staticfiles %}
 
 {% block body %}
 <div class="row">
@@ -36,7 +37,7 @@
                 <li class="bro">
                   <div class="row">
                     <div class="small-12 columns">
-                      <img src="{{ STATIC_URL }}{{ bro.pic }}">
+                      <img src="{% static bro.pic %}">
                     </div>
                   </div>
                   <div class="row">
