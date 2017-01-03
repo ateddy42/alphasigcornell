@@ -342,10 +342,10 @@ def view_users(request):
                 pass
         if "c" in request.GET and "u" in request.GET:
             try:
-                user = Brother.objects.get(uid=int(request.GET["u"]))
-                if not User.objects.get(id=user.uid).groups.filter(name="RushChair"):
-                    user.comments = int(request.GET["c"])
-                    user.save()
+                bro = Brother.objects.get(uid=int(request.GET["u"]))
+                if not User.objects.get(id=bro.uid).groups.filter(name="RushChair"):
+                    bro.comments = int(request.GET["c"])
+                    bro.save()
             except ValueError:
                 pass
         users = User.objects.raw(
@@ -356,8 +356,8 @@ def view_users(request):
                         WHERE g.name = 'RushChair'
                         AND ug.group_id = g.id
                         AND u.id = ug.user_id) as rushChair
-                FROM auth_user u, rush_brothers b
-                WHERE u.id = b.uid
+                FROM auth_user u, rush_brother b
+                WHERE u.id = b.uid_id
                 ORDER BY u.last_name ASC""")
         return render(request, "rush_users.html", { "users":users,
                                                     "comments":comments,})
