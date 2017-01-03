@@ -37,8 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'main',
-    'rush',
+    'main.apps.MainConfig',
+    'rush.apps.RushConfig',
 ]
 
 MIDDLEWARE_CLASSES = [
