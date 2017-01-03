@@ -13,7 +13,7 @@ class Rushee(models.Model):
     build = models.CharField(max_length=50)
     room = models.CharField(max_length=100)
     active = models.BooleanField(default=True)
-    latest_signin = models.IntegerField(default=0)
+    latest_signin = models.ForeignKey('Signin', on_delete=models.CASCADE)
     latest_signin_date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
