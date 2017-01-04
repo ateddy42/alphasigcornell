@@ -97,24 +97,28 @@ function change_pic(u) {
 <li style="margin-left:10"><strong>{{ r.qotd }}</strong> <i>{{ r.ans }}</i></li>
 {% endif %}
 {% endfor %}
-<!-- {% if events %}<br />
+
+{% if events_enabled %}
+{% if events %}<br />
 <u>Events:</U>
 {% for e in events %}
 <li style="margin-left:10">{{ e.event }}</li>
-{% endfor %}<br />
+{% endfor %}
 {% endif %}
-{% if is_sec %}<br />
+{% if is_rush %}<br />
 <form action="event/" method="post" name="event">{% csrf_token %}
 <input name="first" type="hidden" value="{{ first }}" />
 <input name="last" type="hidden" value="{{ last }}" />
 <input name="event" type="text" maxlength="1000" />
 <button name="add" value="add">Add Event</button>
 </form>
-{% endif %} -->
+{% endif %}
+{% endif %}
+
 {% if comments and comments_enabled %}<br />
 <u>Comments:</U>
 {% for c in comments %}
-<li style="margin-left:10">{{ c.comment }}</li>
+<li style="margin-left:10">{{ c.user.first_name }} - {{ c.comment }}</li>
 {% endfor %}
 {% endif %}
 {% if can_comment and comments_enabled %}
@@ -122,7 +126,7 @@ function change_pic(u) {
 <form action="comment/" method="post" name="comment">{% csrf_token %}
 <input name="first" type="hidden" value="{{ first }}" />
 <input name="last" type="hidden" value="{{ last }}" />
-<textarea name="comment">{{thisComment}}</textarea>
+<textarea name="comment">{{ thisComment.comment }}</textarea>
 <button class="small" name="add" value="add">Add Comment</button>
 </form>
 {% endif %}

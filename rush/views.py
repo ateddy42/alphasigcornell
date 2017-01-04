@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, Http404, HttpRequest
-from rush.models import Rushee, Setting, Signin, Comment, Event, Brother
+from rush.models import Rushee, Setting, Signin, Comment, Event, UserComment
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from base64 import b64decode
@@ -14,6 +14,7 @@ DEFAULT_QOTD = "Greatest American hero?"
 TIMEOUT_VAL = 600
 DEFAULT_MIRRORING = 0 # 0 - off, 1 - on
 DEFAULT_COMMENTS = 1 # 0 - off, 1 - on
+DEFAULT_EVENTS = 1 # 0 - off, 1 - on
 
 # Check to see if RUSH_QOTD is in settings
 try:
@@ -45,6 +46,12 @@ try:
 except Setting.DoesNotExist:
     Setting(name="RUSH_COMMENTS", val=DEFAULT_COMMENTS).save()
 
+# Check to see if RUSH_EVENTS is in settings
+try:
+    u = Setting.objects.get(name="RUSH_EVENTS")
+except Setting.DoesNotExist:
+    Setting(name="RUSH_EVENTS", val=DEFAULT_EVENTS).save()
+
 def make_thumb(name):
     size = 120, 90
     out = settings.MEDIA_ROOT + '/rush_pics_small/' + name
@@ -65,20 +72,20 @@ def view_rush(request, first, last):
     if can_view:
         try:
             rush = Rushee.objects.get(first=first, last=last)
-            signin = Signin.objects.filter(rid=rush).order_by('id')
-            comments = Comment.objects.filter(rid=rush).order_by('id')
+            signin = rush.signin_set.order_by('date')
+            comments = rush.comment_set.order_by('id')
+            events = rush.event_set.order_by('event')
+            comments_enabled = Setting.objects.get(name="RUSH_COMMENTS").val
+            events_enabled = Setting.objects.get(name="RUSH_EVENTS").val
             try:
-                thisComment = Comment.objects.get(rid=rush, broid=request.user).comment
-                thisComment = thisComment.split(" - ", 1)[1]
+                thisComment = Comment.objects.get(rush=rush, user=request.user)
             except Comment.DoesNotExist:
                 thisComment = ""
-            comments_enabled = Setting.objects.get(name="RUSH_COMMENTS").val
             can_comment = False
             try:
-                can_comment = Brother.objects.get(uid=request.user).comments
-            except Brother.DoesNotExist:
-                Brother(uid=request.user, comments=False).save()
-            # events = Event.objects.filter(rid=rush).order_by('id')
+                can_comment = UserComment.objects.get(user=request.user).comments
+            except UserComment.DoesNotExist:
+                UserComment(user=request.user, comments=False).save()
             is_rush = request.user.groups.filter(name='RushChair')
             mirroring_settings = Setting.objects.get(name="HOUSE_MIRROR")
             if "m" in request.GET and is_rush: # Turn mirroring on/off
@@ -119,7 +126,8 @@ def view_rush(request, first, last):
                                                     "comments_enabled":comments_enabled,
                                                     "can_comment":can_comment,
                                                     "thisComment":thisComment,
-                                                    # "events":events,
+                                                    "events":events,
+                                                    "events_enabled":events_enabled,
                                                     "is_rush":is_rush,
                                                     "active":active,
                                                     "mirroring":mirroring,})
@@ -134,14 +142,15 @@ def view_house(request):
         return render(request, "rush_house.html")
     u = Setting.objects.get(name="HOUSE_CURRENT")
     comments_enabled = Setting.objects.get(name="RUSH_COMMENTS").val
+    events_enabled = Setting.objects.get(name="RUSH_EVENTS").val
     d = datetime.datetime.utcnow().replace(tzinfo=None) - u.date.replace(tzinfo=None)
     if (datetime.timedelta.total_seconds(d) > Setting.objects.get(name="HOUSE_TIMEOUT").val):
         return render(request, "rush_house.html")
     try:
         rush = Rushee.objects.get(id=u.val)
-        signin = Signin.objects.filter(rid=rush).order_by('date')
-        comments = Comment.objects.filter(rid=rush).order_by('id')
-        events = Event.objects.filter(rid=rush).order_by('id')
+        signin = rush.signin_set.order_by('date')
+        comments = rush.comment_set.order_by('id')
+        events = rush.event_set.order_by('event')
         return render(request, "rush_house.html", {"first":rush.first,
                                                 "last":rush.last,
                                                 "netid":rush.netid,
@@ -152,6 +161,7 @@ def view_house(request):
                                                 "comments":comments,
                                                 "comments_enabled":comments_enabled,
                                                 "events":events,
+                                                "events_enabled":events_enabled,
                                                 "signin":signin,})
     except Rushee.DoesNotExist:
         return render(request, "rush_house.html") 
@@ -246,7 +256,7 @@ def view_all_pic(request):
 def add_comment(request, first, last):
     can_view = request.user.groups.filter(name='Rush')
     comments_enabled = Setting.objects.get(name="RUSH_COMMENTS").val
-    can_comment = Brother.objects.get(uid=request.user).comments
+    can_comment = UserComment.objects.get(user=request.user).comments
     if can_view and comments_enabled and can_comment:
         first = request.POST["first"]
         last = request.POST["last"]
@@ -256,16 +266,15 @@ def add_comment(request, first, last):
         except Rushee.DoesNotExist:
             raise Http404
         try:
-            c = Comment.objects.get(rid=rush, broid = request.user)
+            c = Comment.objects.get(rush=rush, user=request.user)
             print(comment)
             if comment == "":
                 c.delete()
             else:
-                c.comment = request.user.first_name + " - " + comment
+                c.comment = comment
                 c.save()
         except Comment.DoesNotExist:
-            comment = request.user.first_name + " - " + comment
-            Comment(rid=rush, comment=comment, broid=request.user).save()
+            Comment(rush=rush, comment=comment, user=request.user).save()
         return HttpResponseRedirect("/rush/" + first +"_" + last + "/")
     else:
         return HttpResponseRedirect("/rush/" + first +"_" + last + "/")
@@ -279,7 +288,7 @@ def add_event(request, first, last):
         event = request.POST["event"]
         try:
             rush = Rushee.objects.get(first=first, last=last)
-            Event(rid=rush, event=event).save()
+            Event(rush=rush, event=event).save()
         except Rushee.DoesNotExist:
             raise Http404
         return HttpResponseRedirect("/rush/" + first +"_" + last + "/")
@@ -305,7 +314,7 @@ def save_rush(request):
             except Rushee.DoesNotExist:
                 r = Rushee(first=first, last=last, netid=netid, phone=phone, build=build, room=room)
                 r.save()
-            s = Signin(rid=r, qotd=qotd, ans=ans)
+            s = Signin(rush=r, qotd=qotd, ans=ans)
             if img:
                 img_name = last + '-' + first + '-' + timezone.now().strftime("%d-%m-%y") + '.jpeg'
                 s.img = ContentFile(img, img_name)
@@ -313,7 +322,6 @@ def save_rush(request):
             else:
                 img_name = 'no_img.jpeg'
             s.save()
-            r.latest_signin = s.id
             r.latest_signin_date = s.date
             r.save()
             if img:
@@ -340,26 +348,30 @@ def view_users(request):
                 comments = comment_settings.val
             except ValueError:
                 pass
-        if "c" in request.GET and "u" in request.GET:
+        event_settings = Setting.objects.get(name="RUSH_EVENTS")
+        events = event_settings.val
+        if "ee" in request.GET:
             try:
-                bro = Brother.objects.get(uid=int(request.GET["u"]))
-                if not User.objects.get(id=bro.uid).groups.filter(name="RushChair"):
-                    bro.comments = int(request.GET["c"])
-                    bro.save()
+                event_settings.val = int(request.GET["ee"])
+                event_settings.save()
+                events = event_settings.val
             except ValueError:
                 pass
-        users = User.objects.raw(
-            """ SELECT u.id, u.first_name as first,
-                    u.last_name as last,
-                    b.comments as comments,
-                    EXISTS(SELECT * FROM auth_user_groups ug, auth_group g
-                        WHERE g.name = 'RushChair'
-                        AND ug.group_id = g.id
-                        AND u.id = ug.user_id) as rushChair
-                FROM auth_user u, rush_brother b
-                WHERE u.id = b.uid_id
-                ORDER BY u.last_name ASC""")
+        if "c" in request.GET and "u" in request.GET:
+            try:
+                uc = UserComment.objects.get(user=int(request.GET["u"]))
+                if not uc.user.groups.filter(name="RushChair"):
+                    uc.comments = int(request.GET["c"])
+                    uc.save()
+            except ValueError:
+                pass
+        users = []
+        for u in User.objects.all().order_by('last_name'):
+            if not hasattr(u, 'usercomment'):
+                UserComment(user = u).save()
+            users.append(u.usercomment)
         return render(request, "rush_users.html", { "users":users,
-                                                    "comments":comments,})
+                                                    "comments":comments,
+                                                    "events":events,})
     else:
         return render(request, "auth_no.html")

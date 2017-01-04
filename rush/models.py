@@ -13,15 +13,17 @@ class Rushee(models.Model):
     build = models.CharField(max_length=50)
     room = models.CharField(max_length=100)
     active = models.BooleanField(default=True)
-    latest_signin = models.ForeignKey('Signin', on_delete=models.CASCADE)
-    latest_signin_date = models.DateTimeField(default=timezone.now)
+    latest_signin_date = models.DateTimeField()
+
+    def latest_signin(self):
+        return self.signin_set.all().order_by('-date')[0]
 
     def __str__(self):
         return self.last + ", " + self.first
 
 class Signin(models.Model):
     id = models.AutoField(db_index=True, primary_key=True)
-    rid = models.ForeignKey(Rushee, on_delete=models.CASCADE)
+    rush = models.ForeignKey(Rushee, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
     qotd = models.CharField(max_length=100, default='')
     ans = models.CharField(max_length=200, default='')
@@ -29,24 +31,27 @@ class Signin(models.Model):
     img_small = models.ImageField(upload_to='rush_pics_small/', default='/static/rush/no_img.jpeg')
 
     def __str__(self):
-        return self.rid.last + ", " + self.rid.first + " - " + self.date.strftime('%Y-%m-%d - %H:%M')
+        return self.rush.last + ", " + self.rush.first + " - " + self.date.strftime('%Y-%m-%d - %H:%M')
+
+    class Meta:
+        ordering = ('date',)
 
 class Comment(models.Model):
     id = models.AutoField(db_index=True, primary_key=True)
-    rid = models.ForeignKey(Rushee, on_delete=models.CASCADE)
-    broid = models.ForeignKey(User, on_delete=models.CASCADE)
+    rush = models.ForeignKey(Rushee, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     comment = models.CharField(max_length=10000)
 
     def __str__(self):
-        return self.broid.last_name + ", " + self.broid.first_name + " - " + self.rid.last + ", " + self.rid.first
+        return self.user.last_name + ", " + self.user.first_name + " - " + self.rush.last + ", " + self.rush.first
 
 class Event(models.Model):
     id = models.AutoField(db_index=True, primary_key=True)
-    rid = models.ForeignKey(Rushee, on_delete=models.CASCADE)
+    rush = models.ForeignKey(Rushee, on_delete=models.CASCADE)
     event = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.rid.last + ", " + self.rid.first + " - " + self.event
+        return self.rush.last + ", " + self.rush.first + " - " + self.event
 
 class Setting(models.Model):
     name = models.CharField(db_index=True, max_length=100, primary_key=True)
@@ -57,10 +62,10 @@ class Setting(models.Model):
     def __str__(self):
         return self.name
 
-class Brother(models.Model):
+class UserComment(models.Model):
     id = models.AutoField(primary_key=True)
-    uid = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User)
     comments = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.uid.last_name + ", " + self.uid.first_name
+        return self.user.last_name + ", " + self.user.first_name

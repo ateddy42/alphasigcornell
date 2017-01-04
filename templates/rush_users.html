@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load staticfiles %}
+{% load has_group %}
 {% block title %} - Rush - View All{% endblock %}
 
 {% block body %}
@@ -13,6 +14,18 @@
       <div class="switch round">
         <input id="on-off-comments" type="checkbox" {% if comments %}checked{% endif %} onClick="{ window.location = '?ec=' + ((this.checked) ? 1 : 0); }">
         <label for="on-off-comments">
+          <span class="switch-on">ON</span>
+          <span class="switch-off">OFF</span>
+        </label>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="small-9 columns">Event feature for rushes</div>
+    <div class="small-3 columns">
+      <div class="switch round">
+        <input id="on-off-events" type="checkbox" {% if events %}checked{% endif %} onClick="{ window.location = '?ee=' + ((this.checked) ? 1 : 0); }">
+        <label for="on-off-events">
           <span class="switch-on">ON</span>
           <span class="switch-off">OFF</span>
         </label>
@@ -34,13 +47,13 @@
       <tbody>
     {% for u in users %}
         <tr>
-          <td style="font-style:italic">{{ u.last }}</td>
-          <td style="font-style:italic">{{ u.first }}</td>
+          <td style="font-style:italic">{{ u.user.last_name }}</td>
+          <td style="font-style:italic">{{ u.user.first_name }}</td>
           <td style="text-align:center">
-            {% if u.rushChair %}RC{% else %}
+            {% if u.user|has_group:"RushChair" %}RC{% else %}
             <div class="switch round">
-              <input id="on-off-{{u.last}}" type="checkbox" {% if u.comments %}checked{% endif %} onClick="{ window.location = '?u={{u.id}}&c=' + ((this.checked) ? 1 : 0); }">
-              <label for="on-off-{{u.last}}">
+              <input id="on-off-{{ u.user.last_name }}" type="checkbox" {% if u.comments %}checked{% endif %} onClick="{ window.location = '?u={{ u.id }}&amp;c=' + ((this.checked) ? 1 : 0); }">
+              <label for="on-off-{{ u.user.last_name }}">
                 <span class="switch-on">ON</span>
                 <span class="switch-off">OFF</span>
               </label>

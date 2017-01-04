@@ -40,12 +40,15 @@ function change_pic(u) {
 <li style="margin-left:10"><strong>{{ r.qotd }}</strong> <i>{{ r.ans }}</i></li>
 {% endif %}
 {% endfor %}
-{% if events %}<br />
+
+
+{% if events and events_enabled %}<br />
 <u>Events:</U>
 {% for e in events %}
 <li style="margin-left:10">{{ e.event }}</li>
-{% endfor %}<br />
+{% endfor %}
 {% endif %}
+
 {% if comments and comments_enabled %}<br />
 <u>Comments:</U>
 {% for c in comments %}

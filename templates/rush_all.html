@@ -49,7 +49,7 @@
       <div class="small-9 columns">Rush Meeting Mirroring</div>
       <div class="small-3 columns">
         <div class="switch round">
-          <input id="on-off" type="checkbox" {% if mirroring %}checked{% endif %} onClick=" { window.location = '?m=' + ((this.checked) ? 1 : 0) {% if va %} + '&va'{% endif %}; }">
+          <input id="on-off" type="checkbox" {% if mirroring %}checked{% endif %} onClick=" { window.location = '?m=' + ((this.checked) ? 1 : 0) {% if va %} + '&amp;va'{% endif %}; }">
             <label for="on-off">
               <span class="switch-on">ON</span>
               <span class="switch-off">OFF</span>
@@ -96,7 +96,7 @@
         <td style="text-align:center">{% for sig in signin %}{% if rush.latest_signin == sig %}<ul class="clearing-thumbs" data-clearing><li><a href='{% if sig.img.url == "rush/no_img.jpeg" %}{% static "" %}{{ sig.img.url }}{% else %}{{ sig.img.url }}{% endif %}'><img width="120" height="90" src="{% if sig.img_small.url == 'rush/no_img.jpeg' %}{% static "" %}{{ sig.img_small.url }}{% else %}{{ sig.img_small.url }}{% endif %}"></a></li></ul>{% endif %}{% endfor %}</td>
         {% endif %}
         {% if is_rush %}
-        <td style="text-align:center">{% if rush.active %}<a style="text-decoration:none" onClick="return confirm('Are you sure you want to make \'{{rush.first}} {{rush.last}}\' INACTIVE?');" href="/rush/{{rush.first}}_{{rush.last}}/?a=0&n{% if va %}&va{% endif %}">&#9832;</a>{% else %}<a style="text-decoration:none" onClick="return confirm('Are you sure you want to make \'{{rush.first}} {{rush.last}}\' ACTIVE?');" href="/rush/{{rush.first}}_{{rush.last}}/?a=1&n{% if va %}&va{% endif %}">&#9842;</a>{% endif %}</td>
+        <td style="text-align:center">{% if rush.active %}<a style="text-decoration:none" onClick="return confirm('Are you sure you want to make \'{{rush.first}} {{rush.last}}\' INACTIVE?');" href="/rush/{{rush.first}}_{{rush.last}}/?a=0&amp;n{% if va %}&amp;va{% endif %}">&#9832;</a>{% else %}<a style="text-decoration:none" onClick="return confirm('Are you sure you want to make \'{{rush.first}} {{rush.last}}\' ACTIVE?');" href="/rush/{{rush.first}}_{{rush.last}}/?a=1&amp;n{% if va %}&amp;va{% endif %}">&#9842;</a>{% endif %}</td>
         {% endif %}
     
   </tr>
