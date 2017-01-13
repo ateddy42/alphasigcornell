@@ -124,11 +124,11 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATIC_ROOT = BASE_DIR + '/../../site_files/static'
+STATIC_ROOT = BASE_DIR + '/../site_files/static'
 
 MEDIA_URL = '/media/'
 
-MEDIA_ROOT = BASE_DIR + '/../../site_files/media'
+MEDIA_ROOT = BASE_DIR + '/../site_files/media'
 
 TEMPLATES = [
     {
