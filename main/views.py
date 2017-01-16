@@ -8,7 +8,6 @@ def home(request):
     return render(request, 'main_home.html')
 
 def members(request):
-    u = Setting.objects.get(name="OFFICERS_YEAR")
     officers = Officer.objects.filter(displayed=True).order_by('id')
     bros = Brother.objects.filter(active=True).order_by('last')
     return render(request, "main_members.html", {"officers":officers, "bros":bros,})
