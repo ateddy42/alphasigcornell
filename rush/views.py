@@ -359,8 +359,9 @@ def view_users(request):
                 pass
         if "c" in request.GET and "u" in request.GET:
             try:
-                uc = UserComment.objects.get(user=int(request.GET["u"]))
-                if not uc.user.groups.filter(name="RushChair"):
+                u = User.objects.get(id=int(request.GET["u"]))
+                uc = UserComment.objects.get(user=u)
+                if uc and not uc.user.groups.filter(name="RushChair"):
                     uc.comments = int(request.GET["c"])
                     uc.save()
             except ValueError:
