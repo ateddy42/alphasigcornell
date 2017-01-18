@@ -359,12 +359,12 @@ def view_users(request):
                 pass
         if "c" in request.GET and "u" in request.GET:
             try:
-                u = get_object_or_404(User, id=int(request.GET["u"]))
+                u = User.objects.get(id=int(request.GET["u"]))
                 uc = UserComment.objects.get(user=u)
                 if not u.groups.filter(name="RushChair"):
                     uc.comments = request.GET["c"] == '1'
                     uc.save()
-            except ValueError:
+            except (ValueError, User.DoesNotExist, UserComment.DoesNotExist):
                 pass
         users = []
         for u in User.objects.all().order_by('last_name'):
