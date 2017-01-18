@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, Http404, HttpRequest
 from rush.models import Rushee, Setting, Signin, Comment, Event, UserComment
 from django.contrib.auth.decorators import login_required
@@ -359,10 +359,10 @@ def view_users(request):
                 pass
         if "c" in request.GET and "u" in request.GET:
             try:
-                u = User.objects.get(id=int(request.GET["u"]))
+                u = get_object_or_404(User, id=int(request.GET["u"]))
                 uc = UserComment.objects.get(user=u)
-                if uc and not uc.user.groups.filter(name="RushChair"):
-                    uc.comments = int(request.GET["c"])
+                if not u.groups.filter(name="RushChair"):
+                    uc.comments = request.GET["c"] == '1'
                     uc.save()
             except ValueError:
                 pass
