@@ -13,7 +13,7 @@ class Rushee(models.Model):
     build = models.CharField(max_length=50)
     room = models.CharField(max_length=100)
     active = models.BooleanField(default=True)
-    latest_signin_date = models.DateTimeField()
+    latest_signin_date = models.DateTimeField(null=True, blank=True)
 
     def latest_signin(self):
         return self.signin_set.all().order_by('-date')[0]
