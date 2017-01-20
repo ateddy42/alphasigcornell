@@ -52,7 +52,7 @@ function change_pic(u) {
 {% if comments and comments_enabled %}<br />
 <u>Comments:</U>
 {% for c in comments %}
-<li style="margin-left:10">{{ c.comment }}</li>
+<li style="margin-left:10">{{ c.user.first_name }} - {{ c.comment }}</li>
 {% endfor %}
 {% endif %}
 <br>
