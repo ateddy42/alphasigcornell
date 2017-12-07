@@ -42,7 +42,7 @@
                   </div>
                   <div class="row">
                     <div class="small-12 columns">
-                      <span class="name">{{ bro.first }} {{ bro.last }} '{{bro.year|cut:'20'}}</span><br/>
+                      <span class="name">{{ bro.first }} {{ bro.last }} '{{ bro.year|slice:'2:' }}</span><br/>
                       <span class="details">{{ bro.home }}<br/>{{ bro.major}}</span></p>
                     </div>
                   </div>

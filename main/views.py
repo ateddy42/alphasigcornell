@@ -10,6 +10,8 @@ def home(request):
 def members(request):
     officers = Officer.objects.filter(displayed=True).order_by('id')
     bros = Brother.objects.filter(active=True).order_by('last')
+    for b in bros:
+    	b.year = str(b.year)
     return render(request, "main_members.html", {"officers":officers, "bros":bros,})
 
 def history(request):
