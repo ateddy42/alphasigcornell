@@ -110,6 +110,12 @@ input {
 #error{
   color:#C00;
 }
+video, canvas {
+    max-width:400px;
+    transform: rotateY(180deg);
+    -webkit-transform:rotateY(180deg); /* Safari and Chrome */
+    -moz-transform:rotateY(180deg); /* Firefox */
+}
 </style></head>
 <body>
 {% if s %}
@@ -122,35 +128,60 @@ input {
 <img id="crest" src="{% static "rush/crest.png" %}" />
 
 <form action="save/" id="rush_form" method="post" onSubmit="return false" name="rush_form">{% csrf_token %}
-<script src="{% static "rush/webcam.js" %}"></script>
-
-    <div id="my_camera" style="width:320px; height:240px;"></div>
-    <div id="my_result"></div>
+    <div id="camera" style="width:320px; height:240px; padding-right:100px; float:left">
+        <video id="video" autoplay></video>
+        <canvas id="canvas"></canvas>
+    </div>
 
     <script language="JavaScript">
-		Webcam.set({
-			dest_width: 960,
-			dest_height: 720,
-			jpeg_quality: 100,
-   		});
-        Webcam.attach( '#my_camera' );
+    (function() {
+        'use strict';
+        var video = document.getElementById("video");
 
-        function freeze() {
-			if (validateForm()) {
-				Webcam.snap( function(data_uri) {
-					var raw_image_data = data_uri.replace(/^data\:image\/\w+\;base64\,/, '');
-					document.getElementById('img').value = raw_image_data;
-					document.getElementById('sub').innerHTML = "Uploading...";
-					document.getElementById('sub_b').disabled = true;
-					Webcam.freeze();
-					document.getElementById('rush_form').submit();
-				});
-			}
+        function takeSnapshot() {
+            if (!validateForm()) { return false; }
+
+            var canvas = document.getElementById("canvas");
+            var img = document.getElementById("img");
+            var context;
+            var width = 800
+            , height = 600;
+
+            canvas.width = width;
+            canvas.height = height;
+
+            context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, width, height);
+
+            var data_uri = canvas.toDataURL('image/png');
+            var raw_image_data = data_uri.replace(/^data\:image\/\w+\;base64\,/, '');
+            img.value = raw_image_data;
+            video.style = "display:none";
+
+            document.getElementById('sub_text').innerHTML = "Uploading...";
+            document.getElementById('sub_button').disabled = true;
+            document.getElementById('rush_form').submit();
         }
+
+        if (navigator.mediaDevices) {
+            // access the web cam
+            navigator.mediaDevices.getUserMedia({video: true})
+            // permission granted:
+            .then(function(stream) {
+                video.srcObject = stream;
+                var button = document.getElementById('sub_button');
+                button.addEventListener('click', takeSnapshot);
+            })
+            // permission denied:
+            .catch(function(error) {
+                document.body.textContent = 'Could not access the camera. Error: ' + error.name;
+            });
+        }
+      })();
     </script>
 
 	<div id="questions">
-		<input id="img" type="hidden" name="img" value="">
+		<input id="img" type="hidden" name="img" value=""><br />
 		<input width="300" name="first" type="text" placeholder="First name"><br />
 		<input width="300" name="last" type="text" placeholder="Last name"><br />
 		<input width="300" name="netid" type="text" placeholder="NetID, e.g. ath55"><br />
@@ -159,7 +190,10 @@ input {
 		<input width="300" name="room" type="text" placeholder="Room number"><br />
 		<input width="300" name="ans" type="text" placeholder="{{ qotd }}"><br /><br />
 		<input type="hidden" name="qotd" value="{{ qotd }}">
-		<button id="sub_b" onClick="void(freeze())"><img width="50px" src="{% static "rush/camera.png" %}" /></button><p id="sub">(Take picture to submit)</p>
+		<button id="sub_button">
+            <img width="50px" src="{% static "rush/camera.png" %}" />
+        </button>
+        <p id="sub_text">(Take picture to submit)</p>
 	</div>
 </form>
 </body>
