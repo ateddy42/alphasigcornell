@@ -19,7 +19,7 @@ class Brother(models.Model):
     major = models.TextField(max_length=100, default='')
     home = models.TextField(max_length=100, default='')
     year = models.IntegerField(default='1909')
-    pic = models.ImageField(default='main/img/brothers/no_img.jpeg')
+    pic = models.ImageField(upload_to='brothers', blank=True, null=True)
     active = models.BooleanField(default=True)
 
     def __str__(self):

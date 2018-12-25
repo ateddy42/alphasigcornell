@@ -38,7 +38,7 @@
                 <li class="bro">
                   <div class="row">
                     <div class="small-12 columns">
-                      <img src="{% static bro.pic %}">
+                      <img src="{% if bro.pic %}{{ bro.pic.url }}{% else %}{% static 'rush/no_img.jpeg' %}{% endif %}">
                     </div>
                   </div>
                   <div class="row">
