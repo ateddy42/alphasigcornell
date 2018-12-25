@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, Http404, HttpRequest
 from rush.models import Rushee, Setting, Signin, Comment, Event, UserComment
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from base64 import b64decode
 from django.core.files.base import ContentFile
 from PIL import Image
@@ -52,12 +52,28 @@ try:
 except Setting.DoesNotExist:
     Setting(name="RUSH_EVENTS", val=DEFAULT_EVENTS).save()
 
+# Ensure user groups are created
+Group.objects.get_or_create(name='Rush')
+Group.objects.get_or_create(name='RushChair')
+
+# Does user have permission to view rush (group 'Rush')
+def can_view(request):
+    return request.user.groups.filter(name='Rush').exists()
+
+# Does user have permission to edit rush (group 'RushChair')
+def can_edit(request):
+    return request.user.groups.filter(name='RushChair').exists()
+
+# Does user have permission to write comments for rush
+def can_comment(request):
+    can_comment = UserComment.objects.get(user=request.user).comments
+
 def make_thumb(name):
     size = 120, 90
     out = settings.MEDIA_ROOT + '/rush_pics_small/' + name
     img = Image.open(settings.MEDIA_ROOT + '/rush_pics_small/' + name)
     img.thumbnail(size, Image.ANTIALIAS)
-    img.save(out, "JPEG")
+    img.save(out, "PNG")
     return
 
 def add_rush(request):
@@ -68,73 +84,75 @@ def add_rush(request):
 
 @login_required
 def view_rush(request, first, last):
-    can_view = request.user.groups.filter(name='Rush')
-    if can_view:
+    if not can_view(request):
+        return render(request, "auth_no.html")     
+    try:
+        rush = Rushee.objects.get(first=first, last=last)
+        signin = rush.signin_set.order_by('date')
+        comments = rush.comment_set.order_by('id')
+        events = rush.event_set.order_by('event')
+        comments_enabled = Setting.objects.get(name="RUSH_COMMENTS").val
+        events_enabled = Setting.objects.get(name="RUSH_EVENTS").val
+
+        # retrieve existing comments this user left for this rush
         try:
-            rush = Rushee.objects.get(first=first, last=last)
-            signin = rush.signin_set.order_by('date')
-            comments = rush.comment_set.order_by('id')
-            events = rush.event_set.order_by('event')
-            comments_enabled = Setting.objects.get(name="RUSH_COMMENTS").val
-            events_enabled = Setting.objects.get(name="RUSH_EVENTS").val
+            thisComment = Comment.objects.get(rush=rush, user=request.user)
+        except Comment.DoesNotExist:
+            thisComment = ""
+
+        # determine if this user has permission to write a comment
+        can_comment = False
+        try:
+            can_comment = UserComment.objects.get(user=request.user).comments
+        except UserComment.DoesNotExist:
+            UserComment(user=request.user, comments=False).save()
+
+        mirroring_settings = Setting.objects.get(name="HOUSE_MIRROR")
+        if "m" in request.GET and can_edit(request): # Turn mirroring on/off
             try:
-                thisComment = Comment.objects.get(rush=rush, user=request.user)
-            except Comment.DoesNotExist:
-                thisComment = ""
-            can_comment = False
+                mirroring_settings.val = int(request.GET["m"])
+                mirroring_settings.save()
+            except ValueError:
+                pass
+        mirroring = mirroring_settings.val
+        if "a" in request.GET and can_edit(request): # Make rush active/inactive
             try:
-                can_comment = UserComment.objects.get(user=request.user).comments
-            except UserComment.DoesNotExist:
-                UserComment(user=request.user, comments=False).save()
-            is_rush = request.user.groups.filter(name='RushChair')
-            mirroring_settings = Setting.objects.get(name="HOUSE_MIRROR")
-            if "m" in request.GET and is_rush: # Turn mirroring on/off
-                try:
-                    mirroring_settings.val = int(request.GET["m"])
-                    mirroring_settings.save()
-                except ValueError:
-                    pass
-            mirroring = mirroring_settings.val
-            if "a" in request.GET and is_rush: # Make rush active/inactive
-                try:
-                    rush.active = int(request.GET["a"])
-                    rush.save()
-                    if "n" in request.GET:
-                        if "va" in request.GET:
-                            return HttpResponseRedirect("/rush/all/?va")
-                        return HttpResponseRedirect("/rush/all/")
-                except ValueError:
-                    pass
-            active = rush.active
-            
-            if is_rush and mirroring > 0:
-                try:
-                    r = Setting.objects.get(name="HOUSE_CURRENT")
-                    r.val = rush.id
-                    r.date = timezone.now()
-                    r.save()
-                except Setting.DoesNotExist:
-                    Setting(name="HOUSE_CURRENT", val=rush.id).save()
-            return render(request, "rush_single.html", {"first":first,
-                                                    "last":last,
-                                                    "netid":rush.netid,
-                                                    "phone":rush.phone,
-                                                    "build":rush.build,
-                                                    "room":rush.room,
-                                                    "signin":signin,
-                                                    "comments":comments,
-                                                    "comments_enabled":comments_enabled,
-                                                    "can_comment":can_comment,
-                                                    "thisComment":thisComment,
-                                                    "events":events,
-                                                    "events_enabled":events_enabled,
-                                                    "is_rush":is_rush,
-                                                    "active":active,
-                                                    "mirroring":mirroring,})
-        except Rushee.DoesNotExist:
-            raise Http404
-    else:
-        return render(request, "auth_no.html")      
+                rush.active = int(request.GET["a"])
+                rush.save()
+                if "n" in request.GET:
+                    if "va" in request.GET:
+                        return HttpResponseRedirect("/rush/all/?va")
+                    return HttpResponseRedirect("/rush/all/")
+            except ValueError:
+                pass
+        active = rush.active
+        
+        if can_edit(request) and mirroring > 0:
+            try:
+                r = Setting.objects.get(name="HOUSE_CURRENT")
+                r.val = rush.id
+                r.date = timezone.now()
+                r.save()
+            except Setting.DoesNotExist:
+                Setting(name="HOUSE_CURRENT", val=rush.id).save()
+        return render(request, "rush_single.html", {"first":first,
+                                                "last":last,
+                                                "netid":rush.netid,
+                                                "phone":rush.phone,
+                                                "build":rush.build,
+                                                "room":rush.room,
+                                                "signin":signin,
+                                                "comments":comments,
+                                                "comments_enabled":comments_enabled,
+                                                "can_comment":can_comment,
+                                                "thisComment":thisComment,
+                                                "events":events,
+                                                "events_enabled":events_enabled,
+                                                "is_rush":can_edit(request),
+                                                "active":active,
+                                                "mirroring":mirroring,})
+    except Rushee.DoesNotExist:
+        raise Http404 
 
 def view_house(request):
     mirroring = Setting.objects.get(name="HOUSE_MIRROR").val
@@ -168,96 +186,84 @@ def view_house(request):
 
 @login_required
 def view_all(request):
-    can_view = request.user.groups.filter(name='Rush')
-    if can_view:
-        is_rush = request.user.groups.filter(name='RushChair')
-        mirroring_settings = Setting.objects.get(name="HOUSE_MIRROR")
-        qotd_settings = Setting.objects.get(name="RUSH_QOTD")
-        mirroring = mirroring_settings.val
-        # if mirroring and not is_rush:
-        #     return HttpResponseRedirect("/rush/house")
-        qotd = qotd_settings.char
-        if is_rush:
-            if "m" in request.GET:
-                try:
-                    mirroring_settings.val = int(request.GET["m"])
-                    mirroring_settings.save()
-                except ValueError:
-                    pass
-                mirroring = mirroring_settings.val
-            if "q" in request.GET:
-                qotd = request.GET["q"]
-                if len(qotd) == 0:
-                    qotd = qotd_settings.char
-                qotd_settings.char = qotd
-                qotd_settings.save()
-   
-        o = "last" if not "o" in request.GET else request.GET["o"]
-        rushes = []
-        if "va" in request.GET:
-            rushes = Rushee.objects.filter(active__gte = 0).order_by(o)
-        else:
-            rushes = Rushee.objects.filter(active=True).order_by(o)
-        signin = Signin.objects.all()
-        return render(request, "rush_all.html", {"rushes":rushes,
-                                                "signin":signin,
-                                                "pic":False,
-                                                "is_rush":is_rush,
-                                                "qotd":qotd,
-                                                "va":("va" in request.GET),
-                                                "mirroring":mirroring,})
+    if not can_view(request):
+        return render(request, "auth_no.html")   
+    mirroring_settings = Setting.objects.get(name="HOUSE_MIRROR")
+    qotd_settings = Setting.objects.get(name="RUSH_QOTD")
+    mirroring = mirroring_settings.val
+    qotd = qotd_settings.char
+    if can_edit(request):
+        if "m" in request.GET:
+            try:
+                mirroring_settings.val = int(request.GET["m"])
+                mirroring_settings.save()
+            except ValueError:
+                pass
+            mirroring = mirroring_settings.val
+        if "q" in request.GET:
+            qotd = request.GET["q"]
+            if len(qotd) == 0:
+                qotd = qotd_settings.char
+            qotd_settings.char = qotd
+            qotd_settings.save()
+
+    o = "last" if not "o" in request.GET else request.GET["o"]
+    rushes = []
+    if "va" in request.GET:
+        rushes = Rushee.objects.filter(active__gte = 0).order_by(o)
     else:
-        return render(request, "auth_no.html")    
+        rushes = Rushee.objects.filter(active=True).order_by(o)
+    signin = Signin.objects.all()
+    return render(request, "rush_all.html", {"rushes":rushes,
+                                            "signin":signin,
+                                            "pic":False,
+                                            "is_rush":can_edit(request),
+                                            "qotd":qotd,
+                                            "va":("va" in request.GET),
+                                            "mirroring":mirroring,}) 
 
 @login_required
 def view_all_pic(request):
-    can_view = request.user.groups.filter(name='Rush')
-    if can_view:
-        is_rush = request.user.groups.filter(name='RushChair')
-        mirroring_settings = Setting.objects.get(name="HOUSE_MIRROR")
-        qotd_settings = Setting.objects.get(name="RUSH_QOTD")
-        mirroring = mirroring_settings.val
-        # if mirroring and not is_rush:
-        #     return HttpResponseRedirect("/rush/house")
-        qotd = qotd_settings.char
-        if is_rush:
-            if "m" in request.GET:
-                try:
-                    mirroring_settings.val = int(request.GET["m"])
-                    mirroring_settings.save()
-                except ValueError:
-                    pass
-                mirroring = mirroring_settings.val
-            if "q" in request.GET:
-                qotd = request.GET["q"]
-                if len(qotd) == 0:
-                    qotd = qotd_settings.char
-                qotd_settings.char = qotd
-                qotd_settings.save()
-   
-        o = "last" if not "o" in request.GET else request.GET["o"]
-        rushes = []
-        if "va" in request.GET:
-            rushes = Rushee.objects.order_by(o)
-        else:
-            rushes = Rushee.objects.filter(active=True).order_by(o)
-        signin = Signin.objects.all()
-        return render(request, "rush_all.html", {"rushes":rushes,
-                                                "signin":signin,
-                                                "pic":True,
-                                                "is_rush":is_rush,
-                                                "qotd":qotd,
-                                                "va":("va" in request.GET),
-                                                "mirroring":mirroring,})
-    else:
+    if not can_view(request):
         return render(request, "auth_no.html")
+    mirroring_settings = Setting.objects.get(name="HOUSE_MIRROR")
+    qotd_settings = Setting.objects.get(name="RUSH_QOTD")
+    mirroring = mirroring_settings.val
+    qotd = qotd_settings.char
+    if can_edit(request):
+        if "m" in request.GET:
+            try:
+                mirroring_settings.val = int(request.GET["m"])
+                mirroring_settings.save()
+            except ValueError:
+                pass
+            mirroring = mirroring_settings.val
+        if "q" in request.GET:
+            qotd = request.GET["q"]
+            if len(qotd) == 0:
+                qotd = qotd_settings.char
+            qotd_settings.char = qotd
+            qotd_settings.save()
+
+    o = "last" if not "o" in request.GET else request.GET["o"]
+    rushes = []
+    if "va" in request.GET:
+        rushes = Rushee.objects.order_by(o)
+    else:
+        rushes = Rushee.objects.filter(active=True).order_by(o)
+    signin = Signin.objects.all()
+    return render(request, "rush_all.html", {"rushes":rushes,
+                                            "signin":signin,
+                                            "pic":True,
+                                            "is_rush":can_edit(request),
+                                            "qotd":qotd,
+                                            "va":("va" in request.GET),
+                                            "mirroring":mirroring,})
 
 @login_required
 def add_comment(request, first, last):
-    can_view = request.user.groups.filter(name='Rush')
     comments_enabled = Setting.objects.get(name="RUSH_COMMENTS").val
-    can_comment = UserComment.objects.get(user=request.user).comments
-    if can_view and comments_enabled and can_comment:
+    if can_view(request) and comments_enabled and can_comment(request):
         first = request.POST["first"]
         last = request.POST["last"]
         comment = request.POST["comment"]
@@ -316,7 +322,7 @@ def save_rush(request):
                 r.save()
             s = Signin(rush=r, qotd=qotd, ans=ans)
             if img:
-                img_name = last + '-' + first + '-' + timezone.now().strftime("%d-%m-%y") + '.jpeg'
+                img_name = last + '-' + first + '-' + timezone.now().strftime("%d-%m-%y") + '.png'
                 s.img = ContentFile(img, img_name)
                 s.img_small = ContentFile(img, img_name)
             else:
@@ -337,41 +343,39 @@ def save_rush(request):
         raise Http404
 
 def view_users(request):
-    is_rush = request.user.groups.filter(name='RushChair')
-    if is_rush:
-        comment_settings = Setting.objects.get(name="RUSH_COMMENTS")
-        comments = comment_settings.val
-        if "ec" in request.GET:
-            try:
-                comment_settings.val = int(request.GET["ec"])
-                comment_settings.save()
-                comments = comment_settings.val
-            except ValueError:
-                pass
-        event_settings = Setting.objects.get(name="RUSH_EVENTS")
-        events = event_settings.val
-        if "ee" in request.GET:
-            try:
-                event_settings.val = int(request.GET["ee"])
-                event_settings.save()
-                events = event_settings.val
-            except ValueError:
-                pass
-        if "c" in request.GET and "u" in request.GET:
-            try:
-                uc = UserComment.objects.get(id=int(request.GET["u"]))
-                if not uc.user.groups.filter(name="RushChair"):
-                    uc.comments = request.GET["c"] == '1'
-                    uc.save()
-            except (ValueError, User.DoesNotExist, UserComment.DoesNotExist):
-                pass
-        users = []
-        for u in User.objects.all().order_by('last_name'):
-            if not hasattr(u, 'usercomment'):
-                UserComment(user = u).save()
-            users.append(u.usercomment)
-        return render(request, "rush_users.html", { "users":users,
-                                                    "comments":comments,
-                                                    "events":events,})
-    else:
+    if not can_edit(request):
         return render(request, "auth_no.html")
+    comment_settings = Setting.objects.get(name="RUSH_COMMENTS")
+    comments = comment_settings.val
+    if "ec" in request.GET:
+        try:
+            comment_settings.val = int(request.GET["ec"])
+            comment_settings.save()
+            comments = comment_settings.val
+        except ValueError:
+            pass
+    event_settings = Setting.objects.get(name="RUSH_EVENTS")
+    events = event_settings.val
+    if "ee" in request.GET:
+        try:
+            event_settings.val = int(request.GET["ee"])
+            event_settings.save()
+            events = event_settings.val
+        except ValueError:
+            pass
+    if "c" in request.GET and "u" in request.GET:
+        try:
+            uc = UserComment.objects.get(id=int(request.GET["u"]))
+            if not uc.user.groups.filter(name="RushChair"):
+                uc.comments = request.GET["c"] == '1'
+                uc.save()
+        except (ValueError, User.DoesNotExist, UserComment.DoesNotExist):
+            pass
+    users = []
+    for u in User.objects.all().order_by('last_name'):
+        if not hasattr(u, 'usercomment'):
+            UserComment(user = u).save()
+        users.append(u.usercomment)
+    return render(request, "rush_users.html", { "users":users,
+                                                "comments":comments,
+                                                "events":events,})

@@ -38,6 +38,9 @@
             <li class="has-dropdown">
               <a href="#">LINKS</a>
               <ul class="dropdown">
+                {% if request.user.is_staff %}
+                <li><a href="/admin/">ADMIN PAGE</a></li>
+                {% endif %}
                 <li><a href="/brothers/">BROTHERS LOGIN</a></li>
                 <li><a href="https://rockledge.2stayconnected.com/" target="_blank">ALUMNI WEBSITE</a></li>
                 <li><a href="http://rockledgefoundation.org/" target="_blank">ROCKLEDGE FOUNDATION</a></li>

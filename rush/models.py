@@ -64,7 +64,7 @@ class Setting(models.Model):
 
 class UserComment(models.Model):
     id = models.AutoField(primary_key=True)
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     comments = models.BooleanField(default=True)
 
     def __str__(self):

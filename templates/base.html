@@ -62,6 +62,11 @@
 <section class="section">
 <h5 class="title"><a href="/">Home</a></h5>
 </section>
+{% if request.user.is_staff %}
+<section class="section">
+<h5 class="title"><a href="/admin/">Admin Page</a></h5>
+</section>
+{% endif %}
 <section class="section">
 <h5 class="title">{% if "/brothers/" != request.path %}<a href="/brothers/">Brothers</a>{% else %}<em>Brothers</em>{% endif %}</h5>
 </section>

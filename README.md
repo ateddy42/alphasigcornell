@@ -1,11 +1,11 @@
 ### Initial Setup
 
-Install the following versions of `django` and `flup`. Deploying to the remote server with fastcgi will not work for django versions >= 1.9
+Software Requirements
 ```
-pip install django==1.8.7
-pip install flup==1.0.2
+Python = 2.7
+Django = 1.11.17
 ```
-This version uses a MySQL database, so use the dbProps.cnf file to change the connection settings, or create an additional settings file and overwrite the database connection.
+This version uses a MySQL database, so use the dbProps.cnf file to change the connection settings, or create an additional settings file and overwrite the database connection. Sample `dbProps.cnf` listed below.
 
 ### Deploying the Server
 
