@@ -47,7 +47,7 @@ function checkNewConf() {
 {% endif %}
 <div class="row">
 <div class="medium-10 large-7 columns">
-<form name="change_pwd" style="text-align:right" action='/accounts/pwd/' method='post'>{% csrf_token %}
+<form name="change_pwd" style="text-align:right" action='{% url 'pwd' %}' method='post'>{% csrf_token %}
 
 <div class="row">
 <div class="medium-11 columns">

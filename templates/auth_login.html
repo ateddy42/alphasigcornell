@@ -11,7 +11,7 @@
 {% endif %}
 <div class="row">
 <div class="medium-9 large-6 columns">
-<form style="text-align:right" action='/accounts/login/' method='post'>{% csrf_token %}
+<form style="text-align:right" action='{% url 'login' %}' method='post'>{% csrf_token %}
 <div class="row">
 <div class="medium-12 columns">
   	<div class="row collapse prefix-radius">

@@ -5,13 +5,13 @@
 {% block body %}
 <h2>All Rushes</h2>
 {% if pic %}
-<p>View just <a href="/rush/all/">names</a>?</p>
+<p>View just <a href="{% url 'rAll' %}">names</a>?</p>
 {% else %}
-<p>View with <a href="/rush/all/pic/">photos</a>?</p>
+<p>View with <a href="{% url 'rAllPic' %}">photos</a>?</p>
 {% endif %} 
 {% if is_rush %}
 <fieldset>
-  <legend style="background:none;">Rush Chair Settings - <a href="/rush/users/">View Users</a></legend>
+  <legend style="background:none;">Rush Chair Settings - <a href="{% url 'rUsers' %}">View Users</a></legend>
   <div class="row">
     <div class="large-6 columns">
       <p>Change Question of the Day</p>
@@ -89,14 +89,14 @@
         {% if not pic %}
         <td style="text-align:center">{% for sig in signin %}{% if rush.latest_signin == sig %}<ul class="clearing-thumbs" data-clearing><li><a style="text-decoration:none" href='{% if sig.img.url == "rush/no_img.jpeg" %}{% static "" %}{{ sig.img.url }}{% else %}{{ sig.img.url }}{% endif %}'>&#10010;</a></li></ul>{% endif %}{% endfor %}</td>
         {% endif %}
-        <td style="font-style:italic"><a href="/rush/{{rush.first}}_{{rush.last}}/">{{ rush.last }}</a></td>
-        <td style="font-style:italic"><a href="/rush/{{rush.first}}_{{rush.last}}/">{{ rush.first }}</a></td>
+        <td style="font-style:italic"><a href="{% url 'rView' rush.first rush.last %}">{{ rush.last }}</a></td>
+        <td style="font-style:italic"><a href="{% url 'rView' rush.first rush.last %}">{{ rush.first }}</a></td>
         <td class="show-for-medium-up" style="padding-left:10">{{ rush.latest_signin_date }}</td>
         {% if pic %}
         <td style="text-align:center">{% for sig in signin %}{% if rush.latest_signin == sig %}<ul class="clearing-thumbs" data-clearing><li><a href='{% if sig.img.url == "rush/no_img.jpeg" %}{% static "" %}{{ sig.img.url }}{% else %}{{ sig.img.url }}{% endif %}'><img width="120" height="90" src="{% if sig.img_small.url == 'rush/no_img.jpeg' %}{% static "" %}{{ sig.img_small.url }}{% else %}{{ sig.img_small.url }}{% endif %}"></a></li></ul>{% endif %}{% endfor %}</td>
         {% endif %}
         {% if is_rush %}
-        <td style="text-align:center">{% if rush.active %}<a style="text-decoration:none" onClick="return confirm('Are you sure you want to make \'{{rush.first}} {{rush.last}}\' INACTIVE?');" href="/rush/{{rush.first}}_{{rush.last}}/?a=0&amp;n{% if va %}&amp;va{% endif %}">&#9832;</a>{% else %}<a style="text-decoration:none" onClick="return confirm('Are you sure you want to make \'{{rush.first}} {{rush.last}}\' ACTIVE?');" href="/rush/{{rush.first}}_{{rush.last}}/?a=1&amp;n{% if va %}&amp;va{% endif %}">&#9842;</a>{% endif %}</td>
+        <td style="text-align:center">{% if rush.active %}<a style="text-decoration:none" onClick="return confirm('Are you sure you want to make \'{{rush.first}} {{rush.last}}\' INACTIVE?');" href="{% url 'rView' rush.first rush.last %}?a=0&amp;n{% if va %}&amp;va{% endif %}">&#9832;</a>{% else %}<a style="text-decoration:none" onClick="return confirm('Are you sure you want to make \'{{rush.first}} {{rush.last}}\' ACTIVE?');" href="{% url 'rView' rush.first rush.last %}?a=1&amp;n{% if va %}&amp;va{% endif %}">&#9842;</a>{% endif %}</td>
         {% endif %}
     
   </tr>

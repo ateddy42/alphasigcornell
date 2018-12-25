@@ -66,7 +66,7 @@ def can_edit(request):
 
 # Does user have permission to write comments for rush
 def can_comment(request):
-    can_comment = UserComment.objects.get(user=request.user).comments
+    return UserComment.objects.get(user=request.user).comments
 
 def make_thumb(name):
     size = 120, 90
@@ -263,7 +263,7 @@ def view_all_pic(request):
 @login_required
 def add_comment(request, first, last):
     comments_enabled = Setting.objects.get(name="RUSH_COMMENTS").val
-    if can_view(request) and comments_enabled and can_comment(request):
+    if comments_enabled and can_view(request) and can_comment(request):
         first = request.POST["first"]
         last = request.POST["last"]
         comment = request.POST["comment"]
@@ -273,7 +273,6 @@ def add_comment(request, first, last):
             raise Http404
         try:
             c = Comment.objects.get(rush=rush, user=request.user)
-            print(comment)
             if comment == "":
                 c.delete()
             else:
@@ -283,7 +282,7 @@ def add_comment(request, first, last):
             Comment(rush=rush, comment=comment, user=request.user).save()
         return HttpResponseRedirect("/rush/" + first +"_" + last + "/")
     else:
-        return HttpResponseRedirect("/rush/" + first +"_" + last + "/")
+        return render(request, "auth_no.html")
 
 @login_required
 def add_event(request, first, last):

@@ -106,7 +106,7 @@ function change_pic(u) {
 {% endfor %}
 {% endif %}
 {% if is_rush %}<br />
-<form action="event/" method="post" name="event">{% csrf_token %}
+<form action="{% url 'rEvent' first last %}" method="post" name="event">{% csrf_token %}
 <input name="first" type="hidden" value="{{ first }}" />
 <input name="last" type="hidden" value="{{ last }}" />
 <input name="event" type="text" maxlength="1000" />
@@ -123,7 +123,7 @@ function change_pic(u) {
 {% endif %}
 {% if can_comment and comments_enabled %}
 <br />
-<form action="comment/" method="post" name="comment">{% csrf_token %}
+<form action="{% url 'rComment' first last %}" method="post" name="comment">{% csrf_token %}
 <input name="first" type="hidden" value="{{ first }}" />
 <input name="last" type="hidden" value="{{ last }}" />
 <textarea name="comment">{{ thisComment.comment }}</textarea>

@@ -19,24 +19,24 @@
 <div class="panel">
 <div class="row">
 <div class="hide-for-small medium-2 columns">
-<a href="/" style="padding:0px"><img src="{% static "web/asp.png" %}" alt="Rockledge" name="Rockledge" style="max-width:90px" id="Rockledge"/></a>
+<a href="{% url 'home' %}" style="padding:0px"><img src="{% static "web/asp.png" %}" alt="Rockledge" name="Rockledge" style="max-width:90px" id="Rockledge"/></a>
 </div>
 <div class="hide-for-small medium-10 columns" style="text-align:right">
 {% if user.is_authenticated %}
     <p>Welcome, {% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.get_username }}{% endif %}.<br />
-    <a href="/accounts/logout/?next={{ request.path }}">Logout</a> &bull; <a href="/accounts/pwd/">Change Password</a></p>
+    <a href="{% url 'logout' %}?next={{ request.path }}">Logout</a> &bull; <a href="{% url 'pwd' %}">Change Password</a></p>
 {% else %}
-<p>Welcome, new user. Please <a href="/accounts/login/?next={{ request.path }}">log in</a>.</p>
+<p>Welcome, new user. Please <a href="{% url 'login' %}?next={{ request.path }}">log in</a>.</p>
 {% endif %}
 </div>
 <div class="row">
 <div class="small-centered show-for-small-only" style="text-align:center">
-<a href="/" style="padding:0px"><img src="{% static "web/asp.png" %}" alt="Rockledge" name="Rockledge" style="max-width:90px" id="Rockledge"/></a><br>
+<a href="{% url 'home' %}" style="padding:0px"><img src="{% static "web/asp.png" %}" alt="Rockledge" name="Rockledge" style="max-width:90px" id="Rockledge"/></a><br>
 {% if user.is_authenticated %}
     <p>Welcome, {% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.get_username }}{% endif %}.<br />
-    <a href="/accounts/logout/?next={{ request.path }}">Logout</a> &bull; <a href="/accounts/pwd/">Change Password</a></p>
+    <a href="{% url 'logout' %}?next={{ request.path }}">Logout</a> &bull; <a href="{% url 'pwd' %}">Change Password</a></p>
 {% else %}
-<p>Welcome, new user. Please <a href="/accounts/login/?next={{ request.path }}">log in</a>.</p>
+<p>Welcome, new user. Please <a href="{% url 'login' %}?next={{ request.path }}">log in</a>.</p>
 {% endif %}
 </div>
 </div>
@@ -45,14 +45,14 @@
 </div>
 
 {% block nav %}
+{% url 'brothers' as urlBrothers %}
+{% url 'calendar' as urlCalendar %}
+{% url 'rAll' as urlAll %}
 <div class="row show-for-small-only">
 <nav class="breadcrumbs">
-  <a href="/brothers/" {% if "/brothers/" == request.path %}class="current"{% endif %}>Bros</a>
-  <a target="_blank" href="https://www.google.com/calendar/embed?src=cornell.edu_1uiu0h2c6fob5do40vehvurqlk%40group.calendar.google.com&ctz=America/New_York">Calendar</a>
-  <!-- <a href="/treas/" {% if "/treas/" == request.path %}class="current"{% endif %}>Treasurer</a> -->
-  <!-- <a href="/reunion/all" {% if "/reunion/all/" == request.path %}class="current"{% endif %}>Reunion</a> -->
-  <a href="/rush/all/" {% if "/rush/all/" == request.path %}class="current"{% endif %}>Rush</a>
-  <!--<a href="/wiki/brother/" {% if "/wiki/brother" == request.path %}class="current"{% endif %}>Wiki</a>-->
+  <a href="{% url 'brothers' %}" {% ifequal request.path urlBrothers %}class="current"{% endifequal %}>Bros</a>
+  <a target="_blank" href="https://www.google.com/calendar/embed?src=cornell.edu_1uiu0h2c6fob5do40vehvurqlk%40group.calendar.google.com&ctz=America/New_York"m{% ifequal request.path urlCalendar %}class="current"{% endifequal %}>Calendar</a>
+  <a href="{% url 'rAll' %}" {% ifequal request.path urlAll %}class="current"{% endifequal %}>Rush</a>
 </nav><br>
 </div>
 <div class="row">
@@ -60,34 +60,25 @@
 <div class="panel">
 <div class="section-container vertical-nav" data-section data-options="deep_linking: false; one_up: true">
 <section class="section">
-<h5 class="title"><a href="/">Home</a></h5>
+<h5 class="title"><a href="{% url 'home' %}">Home</a></h5>
 </section>
 {% if request.user.is_staff %}
 <section class="section">
-<h5 class="title"><a href="/admin/">Admin Page</a></h5>
+<h5 class="title"><a href="{% url 'admin:index' %}">Admin Page</a></h5>
 </section>
 {% endif %}
 <section class="section">
-<h5 class="title">{% if "/brothers/" != request.path %}<a href="/brothers/">Brothers</a>{% else %}<em>Brothers</em>{% endif %}</h5>
+<h5 class="title">{% ifnotequal request.path urlBrothers %}<a href="{{ urlBrothers }}">Brothers</a>{% else %}<em>Brothers</em>{% endifnotequal %}</h5>
 </section>
 <section class="section show-for-large-up">
-<h5 class="title">{% if "/calendar/" != request.path %}<a href="/calendar/">Calendar</a>{% else %}<em>Calendar</em>{% endif %}</h5>
+<h5 class="title">{% ifnotequal request.path urlCalendar %}<a href="{{ urlCalendar }}">Calendar</a>{% else %}<em>Calendar</em>{% endifnotequal %}</h5>
 </section>
 <section class="section hide-for-large-up">
-<h5 class="title"><a target="_blank" href="https://www.google.com/calendar/embed?src=cornell.edu_1uiu0h2c6fob5do40vehvurqlk%40group.calendar.google.com&ctz=America/New_York">Calendar</a></h5>
+<h5 class="title"><a target="_blank" href="">Calendar</a></h5>
 </section>
-<!-- <section class="section">
-<h5 class="title">{% if "/treas/" != request.path %}<a href="/treas/">Treasurer</a>{% else %}<em>Treasurer</em>{% endif %}</h5>
-</section> -->
-<!-- <section class="section">
-<h5 class="title">{% if "/reunion/all/" != request.path %}<a href="/reunion/all/">Reunion</a>{% else %}<em>Reunion</em>{% endif %}</h5>
-</section> -->
 <section class="section">
-<h5 class="title">{% if "/rush/all/" != request.path %}<a href="/rush/all/">Rush</a>{% else %}<em>Rush</em>{% endif %}</h5>
+<h5 class="title">{% ifnotequal request.path urlAll %}<a href="{{ urlAll }}">Rush</a>{% else %}<em>Rush</em>{% endifnotequal %}</h5>
 </section>
-<!--<section class="section">
-<h5 class="title">{% if "/wiki/brother/" != request.path %}<a href="/wiki/brother/">Wiki</a>{% else %}<em>Wiki</em>{% endif %}</h5>
-</section>-->
 </div>
 </div>
 </aside>

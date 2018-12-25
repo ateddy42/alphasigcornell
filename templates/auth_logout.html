@@ -3,5 +3,5 @@
 {% block title %} - Logout{% endblock %}
   
 {% block body %}
-<p>You are now logged out. <a href="/accounts/login/?next={{ next }}">Log in</a> again?</p>
+<p>You are now logged out. <a href="{% url 'login' %}?next={{ next }}">Log in</a> again?</p>
 {% endblock %}
