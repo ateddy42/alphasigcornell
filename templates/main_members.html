@@ -1,5 +1,6 @@
 {% extends "main_base.html" %}
 {% load staticfiles %}
+{% load splitYear %}
 
 {% block body %}
 <div class="row">
@@ -37,12 +38,12 @@
                 <li class="bro">
                   <div class="row">
                     <div class="small-12 columns">
-                      <img src="{% static bro.pic %}">
+                      <img src="{% if bro.pic %}{{ bro.pic.url }}{% else %}{% static 'rush/no_img.jpeg' %}{% endif %}">
                     </div>
                   </div>
                   <div class="row">
                     <div class="small-12 columns">
-                      <span class="name">{{ bro.first }} {{ bro.last }} '{{ bro.year|slice:'2:' }}</span><br/>
+                      <span class="name">{{ bro.first }} {{ bro.last }} '{{ bro.year|splitYear }}</span><br/>
                       <span class="details">{{ bro.home }}<br/>{{ bro.major}}</span></p>
                     </div>
                   </div>

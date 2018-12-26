@@ -21,7 +21,7 @@
         <ul class="title-area">
           <li class="name">
             <h1>
-              <a href="/">
+              <a href="{% url 'home' %}">
                 Alpha Sigma Phi, Iota Chapter
               </a>
             </h1>
@@ -31,14 +31,17 @@
 
         <section class="top-bar-section">
           <ul class="right">
-          	<li><a href="/">HOME</a></li>
-            <li><a href="/history/">HISTORY</a></li>
-            <li><a href="/members/">MEMBERS</a></li>
-            <li><a href="/recruitment/">RECRUITMENT</a></li>
+          	<li><a href="{% url 'home' %}">HOME</a></li>
+            <li><a href="{% url 'history' %}">HISTORY</a></li>
+            <li><a href="{% url 'members' %}">MEMBERS</a></li>
+            <li><a href="{% url 'recruitment' %}">RECRUITMENT</a></li>
             <li class="has-dropdown">
               <a href="#">LINKS</a>
               <ul class="dropdown">
-                <li><a href="/brothers/">BROTHERS LOGIN</a></li>
+                {% if request.user.is_staff %}
+                <li><a href="{% url 'admin:index' %}">ADMIN PAGE</a></li>
+                {% endif %}
+                <li><a href="{% url 'brothers' %}">BROTHERS LOGIN</a></li>
                 <li><a href="https://rockledge.2stayconnected.com/" target="_blank">ALUMNI WEBSITE</a></li>
                 <li><a href="http://rockledgefoundation.org/" target="_blank">ROCKLEDGE FOUNDATION</a></li>
                 <li><a href="http://alphasigmaphi.org/" target="_blank">NATIONAL WEBSITE</a></li>
