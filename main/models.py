@@ -24,3 +24,6 @@ class Brother(models.Model):
 
     def __str__(self):
         return self.last + ", " + self.first
+
+    class Meta:
+        ordering = ('last',)

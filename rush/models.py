@@ -21,6 +21,9 @@ class Rushee(models.Model):
     def __str__(self):
         return self.last + ", " + self.first
 
+    class Meta:
+        ordering = ('last',)
+
 class Signin(models.Model):
     id = models.AutoField(db_index=True, primary_key=True)
     rush = models.ForeignKey(Rushee, on_delete=models.CASCADE)
@@ -61,6 +64,9 @@ class Setting(models.Model):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        ordering = ('name',)
 
 class UserComment(models.Model):
     id = models.AutoField(primary_key=True)
