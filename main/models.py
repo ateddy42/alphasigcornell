@@ -4,6 +4,7 @@ from django.db import models
 
 class Officer(models.Model):
     id = models.AutoField(db_index=True, max_length=4, primary_key=True)
+    order = models.IntegerField(default=0)
     position = models.TextField(max_length=100, default='')
     name = models.TextField(max_length=100, default='', null=False)
     email = models.EmailField(max_length=75, default='', null=False)
@@ -11,6 +12,9 @@ class Officer(models.Model):
 
     def __str__(self):
         return self.position + " - " + self.name
+
+    class Meta:
+        ordering = ['order']
     
 class Brother(models.Model):
     id = models.AutoField(db_index=True, max_length=4, primary_key=True)
@@ -26,4 +30,4 @@ class Brother(models.Model):
         return self.last + ", " + self.first
 
     class Meta:
-        ordering = ('last',)
+        ordering = ['last']
