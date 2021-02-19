@@ -3,7 +3,15 @@ from django.template import RequestContext
 from django.http import HttpResponseRedirect
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
+from rush.models import Setting
 
+DEFAULT_MEMBERS = 1 # 0 - off, 1 - on. Whether to show the member's tab of the website
+
+# Check to see if DEFAULT_MEMBERS is in settings
+try:
+    u = Setting.objects.get(name="SHOW_MEMBERS")
+except Setting.DoesNotExist:
+    Setting(name="SHOW_MEMBERS", val=DEFAULT_MEMBERS).save()
 
 def login(request):
     if request.user.is_authenticated():

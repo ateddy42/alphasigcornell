@@ -55,6 +55,18 @@ admin.site.register(UserComment, UserCommentAdmin)
 class SettingAdmin(admin.ModelAdmin):
     list_display = ('__str__', 'settingValue')
 
+    def enableSetting(modeladmin, request, queryset):
+        rows_updated = queryset.update(val=1)
+        modeladmin.message_user(request, "Successfully enabled %s setting(s)" % rows_updated)
+    enableSetting.short_description = "Enable Setting"
+
+    def disableSetting(modeladmin, request, queryset):
+        rows_updated = queryset.update(val=0)
+        modeladmin.message_user(request, "Successfully disabled %s setting(s)" % rows_updated)
+    disableSetting.short_description = "Disable Setting"
+
+    actions = [enableSetting, disableSetting]
+
     def settingValue(self, obj):
         if obj.char:
             return obj.char

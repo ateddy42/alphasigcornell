@@ -1,22 +1,29 @@
 from django.shortcuts import render
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from main.models import Officer, Brother
 from rush.models import Setting
 from datetime import date
 
 def home(request): 
-    return render(request, 'main_home.html')
+    show_members = Setting.objects.get(name="SHOW_MEMBERS").val
+    return render(request, 'main_home.html', {"show_members":show_members,})
 
 def members(request):
-    officers = Officer.objects.filter(displayed=True).order_by('order')
-    bros = Brother.objects.filter(active=True).order_by('last')
-    return render(request, "main_members.html", {"officers":officers, "bros":bros,})
+    if (Setting.objects.get(name="SHOW_MEMBERS").val == 1):
+        officers = Officer.objects.filter(displayed=True).order_by('order')
+        bros = Brother.objects.filter(active=True).order_by('last')
+        show_members = Setting.objects.get(name="SHOW_MEMBERS").val
+        return render(request, "main_members.html", {"officers":officers, "bros":bros, "show_members":show_members,})
+    else:
+        return HttpResponseRedirect("/")
 
 def history(request):
-    return render(request, "main_history.html")
+    show_members = Setting.objects.get(name="SHOW_MEMBERS").val
+    return render(request, "main_history.html", {"show_members":show_members,})
 
 def recruitment(request):
-    return render(request, "main_recruitment.html")
+    show_members = Setting.objects.get(name="SHOW_MEMBERS").val
+    return render(request, "main_recruitment.html", {"show_members":show_members,})
 
 def error(request):
     raise Http404

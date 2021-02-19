@@ -58,7 +58,7 @@ class Event(models.Model):
 
 class Setting(models.Model):
     name = models.CharField(db_index=True, max_length=100, primary_key=True)
-    char = models.CharField(max_length=100, default='')
+    char = models.CharField(max_length=100, default='', null=True, blank=True)
     val = models.IntegerField(default=0)
     date = models.DateTimeField(auto_now=True)
 

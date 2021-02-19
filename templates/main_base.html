@@ -33,7 +33,7 @@
           <ul class="right">
           	<li><a href="{% url 'home' %}">HOME</a></li>
             <li><a href="{% url 'history' %}">HISTORY</a></li>
-            <li><a href="{% url 'members' %}">MEMBERS</a></li>
+            {% if show_members %}<li><a href="{% url 'members' %}">MEMBERS</a></li>{% endif %}
             <li><a href="{% url 'recruitment' %}">RECRUITMENT</a></li>
             <li class="has-dropdown">
               <a href="#">LINKS</a>
