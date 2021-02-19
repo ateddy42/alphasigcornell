@@ -33,6 +33,18 @@ admin.site.register(Brother, BrotherAdmin)
 class OfficerAdmin(admin.ModelAdmin):
     list_display = ('position', 'name', 'email', 'displayed')
 
+    def showOfficer(modeladmin, request, queryset):
+        rows_updated = queryset.update(displayed=True)
+        modeladmin.message_user(request, "Successfully displayed %s officer(s)" % rows_updated)
+    showOfficer.short_description = "Show Officers"
+
+    def hideOfficer(modeladmin, request, queryset):
+        rows_updated = queryset.update(displayed=False)
+        modeladmin.message_user(request, "Successfully hid %s officer(s)" % rows_updated)
+    hideOfficer.short_description = "Hide Officers"
+
+    actions = [showOfficer, hideOfficer]
+
     formfield_overrides = {
         models.TextField: {'widget': Textarea(attrs={'rows':1, 'cols':30})},
     }
